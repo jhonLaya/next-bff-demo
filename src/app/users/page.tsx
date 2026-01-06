@@ -3,6 +3,7 @@ import { Cards } from "@/components";
 import { User } from "@/dtos";
 import { getUsers } from "@/services";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function Users() {
     const [pageSize, setPageSize] = useState(25);
@@ -39,6 +40,14 @@ export default function Users() {
                 <option value="75">75 usuarios</option>
                 <option value="100">100 usuarios</option>
             </select>
+
+            <Link
+                href="/users/me"
+                className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
+            >
+                Mi perfil
+            </Link>
+            
             <div className="flex flex-wrap items-center justify-center">
                 {users.map((user: User, index: number) => (
                     <Cards key={index} title={`${user.firstName} ${user.lastName}`} description={user.email} image={user.image} />
