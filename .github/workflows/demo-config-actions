@@ -2,7 +2,7 @@ name: Build + Push Docker image (Docker Hub)
 
 on:
   push:
-    branches: ["main"]
+    branches: ["staging"]
 
 jobs:
   dockerhub:
