@@ -1,0 +1,36 @@
+name: Deploy Node.js project to Azure Function App
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  container.registry-auth:
+    - name: Get Docker JWT
+      env: 
+        USER: ${{ secrets.DOCKER_USERNAME }}
+        PASSWD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        TOKEN=$(curl -sS -X POST "https://hub.docker.com/v2/users/login/" \
+          -H "Content-Type: application/json" \
+          -d "{\"username\":\"$USER\",\"password\":\"$PASSWD\"}" | jq -r .token)
+        echo "DOCKER_TOKEN=${TOKEN}" >> $GITHUB_ENV
+
+    - name: Delete image if it exists
+      env: 
+        IMAGE: ${{ secrets.DOCKER_IMAGE }}
+        REPO: ${{ secrets.DOCKER_REPO }}
+      run: |
+        curl -fsS -X DELETE \
+          -H "Authorization: JWT $DH_TOKEN" \
+          "https://hub.docker.com/v2/repositories/$USER/$REPO/tags/latest/"
+
+    - name: Build and push
+      env: 
+        IMAGE: ${{ secrets.DOCKER_IMAGE }}
+        REPO: ${{ secrets.DOCKER_REPO }}
+      run: |
+        docker build -t $IMAGE .
+        docker tag $IMAGE $REPO:latest
+        docker push $REPO:latest
+        docker push $REPO:${{ github.sha }}
