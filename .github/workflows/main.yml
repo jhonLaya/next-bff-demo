@@ -34,7 +34,7 @@ jobs:
       - name: Delete :latest tag if exists (Docker Hub)
         env:
           USER: ${{ secrets.DOCKER_USERNAME }}
-          REPO: ${{ secrets.DOCKER_REPO }}  # solo el nombre del repo, ej "test"
+          REPO: ${{ secrets.DOCKER_REPO }}
         run: |
           curl -sS -o /dev/null -w "%{http_code}\n" \
             -X DELETE \
@@ -53,3 +53,8 @@ jobs:
           IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
         run: |
           docker push $IMAGE:latest
+
+      - name: Call webhook on success
+        if: success()
+        run: |
+          curl -X POST "https://webhook.site/698aa498-1516-4ee1-bb34-56dcd010b4f1"
